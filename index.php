@@ -37,16 +37,16 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// Funkcija za automatsko pretvaranje TeraBox linka ili pCloud koda u Embed iframe
+// Funkcija za automatsko pretvaranje linkova ili iframe kodova u ispravan Embed iframe
 function convertToEmbed($input) {
     $input = trim($input);
     
-    // Ako je već unesen <iframe> kod (npr. pCloud)
+    // Ako je već unesen <iframe> kod (npr. DoodStream/pCloud/TeraBox iframe)
     if (strpos($input, '<iframe') !== false) {
         return $input;
     }
 
-    // Ekstrakcija TeraBox ključa iz linka (npr. /s/1ABCxyz... ili ?surl=1ABCxyz...)
+    // Ekstrakcija TeraBox ključa iz linka
     $surl = '';
     if (preg_match('/\/s\/1([a-zA-Z0-9_-]+)/', $input, $matches)) {
         $surl = $matches[1];
@@ -58,8 +58,8 @@ function convertToEmbed($input) {
         return '<iframe src="https://www.terabox.com/sharing/embed?surl=' . htmlspecialchars($surl) . '" width="100%" height="100%" frameborder="0" allowfullscreen scrolling="no"></iframe>';
     }
 
-    // Ako nije prepoznat TeraBox format, stavi link u osnovni iframe
-    return '<iframe src="' . htmlspecialchars($input) . '" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>';
+    // Za sve ostale linkove (uključujući DoodStream / Playmogo direct embed linkove)
+    return '<iframe src="' . htmlspecialchars($input) . '" width="100%" height="100%" frameborder="0" allowfullscreen scrolling="no"></iframe>';
 }
 
 // Add New Video (Admin only)
@@ -195,7 +195,7 @@ $total_pages = ceil($total_videos / $limit);
     <div id="loginModal" class="admin-panel" style="display: <?php echo $login_error ? 'block' : 'none'; ?>;">
         <h3>Admin Login</h3>
         <?php if ($login_error) echo "<p style='color:red;'>$login_error</p>"; ?>
-        <form method="POST">
+        <form action="index.php" method="POST">
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit" name="admin_login" class="admin-btn" style="width:100%; margin-top:5px;">Login</button>
@@ -206,9 +206,9 @@ $total_pages = ceil($total_videos / $limit);
     <?php if (isset($_SESSION['admin_logged'])): ?>
         <div class="admin-panel">
             <h3>Add New Video</h3>
-            <form method="POST">
+            <form action="index.php" method="POST">
                 <input type="text" name="naslov" placeholder="Video Title" required>
-                <textarea name="embed_kod" rows="3" placeholder="Paste TeraBox Link (Copy Link) or pCloud Embed Code here" required></textarea>
+                <textarea name="embed_kod" rows="3" placeholder="Paste DoodStream Embed Code / Link or TeraBox Link here" required></textarea>
                 <select name="kategorija" required>
                     <option value="">-- Select Category --</option>
                     <?php foreach ($categories as $cat): ?>
